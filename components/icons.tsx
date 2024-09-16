@@ -14,6 +14,7 @@ import {
   Loader2,
   Moon,
   MoreVertical,
+  Pencil,
   Pizza,
   Plus,
   Settings,
@@ -47,6 +48,7 @@ export const Icons = {
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
+  pencil: Pencil,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

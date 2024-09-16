@@ -10,33 +10,31 @@ on the client-side to correctly match component state and props should the order
 React server components don't track state between rerenders, so leaving the uniquely identified components (e.g. SpeciesCard)
 can cause errors with matching props and state in child components if the list order changes.
 */
-import { Icons } from "@/components/icons";
-import { Button } from "@/components/ui/button";
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
 import DetailedViewDialog from "./detailed-view-dialog";
+import EditSpeciesDialog from "./edit-species-dialog";
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
 export default function SpeciesCard({ species, userId }: { species: Species; userId: string }) {
   // changes: made the card flex, justifying between
   return (
     <div className="m-4 flex w-72 min-w-72 flex-col justify-between rounded border-2 p-3 shadow">
-      {species.image && (
-        <div className="relative h-40 w-full">
-          <Image src={species.image} alt={species.scientific_name} fill style={{ objectFit: "cover" }} />
+      <div className="flex flex-col justify-start">
+        {species.image && (
+          <div className="relative h-40 w-full">
+            <Image src={species.image} alt={species.scientific_name} fill style={{ objectFit: "cover" }} />
+          </div>
+        )}
+
+        <div className="flex justify-between">
+          <h3 className="mt-3 text-2xl font-semibold">{species.scientific_name} </h3>
+          <EditSpeciesDialog species={species} userId={userId} />
         </div>
-      )}
-
-      {userId == species.author && (
-        <Button variant="ghost" className="">
-          <Icons.pencil className="mr-3 h-5 w-5" />
-        </Button>
-      )}
-
-      <h3 className="mt-3 text-2xl font-semibold">{species.scientific_name}</h3>
-      <h4 className="text-lg font-light italic">{species.common_name}</h4>
-      <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
-      {/* Replace the button with the detailed view dialog. */}
+        <h4 className="text-lg font-light italic">{species.common_name}</h4>
+        <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
+        {/* Replace the button with the detailed view dialog. */}
+      </div>
       <DetailedViewDialog species={species} />
     </div>
   );

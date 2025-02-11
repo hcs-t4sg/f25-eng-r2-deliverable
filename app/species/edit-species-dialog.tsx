@@ -14,7 +14,7 @@ import { createBrowserSupabaseClient } from "@/lib/client-utils";
 import { useState } from "react";
 
 type Species = {
-  id: number; // Use ID for updates
+  id: number;
   scientific_name: string;
   common_name: string | null;
   total_population: number | null;
@@ -33,7 +33,6 @@ export default function EditSpeciesDialog({
 }) {
   const supabase = createBrowserSupabaseClient();
 
-  // Form state
   const [scientificName, setScientificName] = useState(species.scientific_name);
   const [commonName, setCommonName] = useState(species.common_name || "");
   const [totalPopulation, setTotalPopulation] = useState(species.total_population || "");
@@ -44,13 +43,13 @@ export default function EditSpeciesDialog({
     const { error } = await supabase
       .from("species")
       .update({
-        scientific_name: scientificName, 
+        scientific_name: scientificName,
         common_name: commonName || null,
         total_population: totalPopulation ? Number(totalPopulation) : null,
         kingdom,
         description: description || null,
       })
-      .eq("id", species.id); // Updating by ID
+      .eq("id", species.id);
 
     if (error) {
       alert("Failed to update species: " + error.message);
@@ -59,6 +58,21 @@ export default function EditSpeciesDialog({
 
     setOpen(false);
     alert("Species updated successfully!");
+  };
+
+  const handleDelete = async () => {
+    const confirmed = confirm("Are you sure you want to delete this species?");
+    if (!confirmed) return;
+
+    const { error } = await supabase.from("species").delete().eq("id", species.id);
+
+    if (error) {
+      alert("Failed to delete species: " + error.message);
+      return;
+    }
+
+    setOpen(false);
+    alert("Species deleted successfully!");
   };
 
   return (
@@ -113,6 +127,11 @@ export default function EditSpeciesDialog({
               Cancel
             </Button>
           </DialogClose>
+        </div>
+        <div className="mt-4">
+          <Button onClick={handleDelete} variant="secondary" className="w-full">
+            Delete Species
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

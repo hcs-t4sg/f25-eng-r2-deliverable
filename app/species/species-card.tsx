@@ -53,7 +53,7 @@ export default function SpeciesCard({
       </Button>
       <LearnMoreDialog species={species} open={learnMoreOpen} setOpen={setLearnMoreOpen} />
 
-      {/* Edit button - Always visible, but restricted with a check */}
+      {/* Edit button */}
       <Button className="mt-2 w-full" variant="outline" onClick={handleEditClick}>
         Edit
       </Button>

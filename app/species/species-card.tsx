@@ -14,11 +14,28 @@ import { Button } from "@/components/ui/button";
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
 import LearnMoreDialog from "./learn-more-dialog";
+import EditSpeciesDialog from "./edit-species-dialog";
 import { useState } from "react";
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
-export default function SpeciesCard({ species }: { species: Species }) {
-  const [open, setOpen] = useState<boolean>(false);
+export default function SpeciesCard({
+  species,
+  sessionId,
+}: {
+  species: Species;
+  sessionId: string;
+}) {
+  const [learnMoreOpen, setLearnMoreOpen] = useState<boolean>(false);
+  const [editOpen, setEditOpen] = useState<boolean>(false);
+
+  const handleEditClick = () => {
+    if (species.author !== sessionId) {
+      alert("Cannot edit since you are not the author");
+      return;
+    }
+    setEditOpen(true);
+  };
+
   return (
     <div className="m-4 w-72 min-w-72 flex-none rounded border-2 p-3 shadow">
       {species.image && (
@@ -29,14 +46,18 @@ export default function SpeciesCard({ species }: { species: Species }) {
       <h3 className="mt-3 text-2xl font-semibold">{species.scientific_name}</h3>
       <h4 className="text-lg font-light italic">{species.common_name}</h4>
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
-      
-      {/* Button to open the Learn More modal */}
-      <Button className="mt-3 w-full" onClick={() => setOpen(true)}>
+
+      {/* Learn More button */}
+      <Button className="mt-3 w-full" onClick={() => setLearnMoreOpen(true)}>
         Learn More
       </Button>
+      <LearnMoreDialog species={species} open={learnMoreOpen} setOpen={setLearnMoreOpen} />
 
-      {/* The Learn More Dialog */}
-      <LearnMoreDialog species={species} open={open} setOpen={setOpen} />
+      {/* Edit button - Always visible, but restricted with a check */}
+      <Button className="mt-2 w-full" variant="outline" onClick={handleEditClick}>
+        Edit
+      </Button>
+      <EditSpeciesDialog species={species} open={editOpen} setOpen={setEditOpen} />
     </div>
   );
 }

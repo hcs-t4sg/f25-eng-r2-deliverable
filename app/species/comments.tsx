@@ -23,8 +23,7 @@ export default function Comments({
   const supabase = createBrowserSupabaseClient();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
-
-  // Fetch comments
+  
   useEffect(() => {
     const fetchComments = async () => {
       const { data, error } = await supabase

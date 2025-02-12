@@ -51,7 +51,7 @@ export default function SpeciesCard({
       <Button className="mt-3 w-full" onClick={() => setLearnMoreOpen(true)}>
         Learn More
       </Button>
-      <LearnMoreDialog species={species} open={learnMoreOpen} setOpen={setLearnMoreOpen} />
+      <LearnMoreDialog species={species} open={learnMoreOpen} setOpen={setLearnMoreOpen} sessionId={sessionId} />
 
       {/* Edit button */}
       <Button className="mt-2 w-full" variant="outline" onClick={handleEditClick}>

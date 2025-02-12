@@ -52,7 +52,7 @@ export default function EditSpeciesDialog({
       .eq("id", species.id);
 
     if (error) {
-      alert("Failed to update species: " + error.message);
+      alert("Failed to update species");
       return;
     }
 

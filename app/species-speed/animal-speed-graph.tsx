@@ -1,9 +1,10 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState  } from "react";
 import { select } from "d3-selection";
 import { scaleBand, scaleLinear, scaleOrdinal } from "d3-scale";
 import { max } from "d3-array";
 import { axisBottom, axisLeft } from "d3-axis"; // D3 is a JavaScript library for data visualization: https://d3js.org/
+import { csv } from "d3-fetch";
 
 // Example data: Only the first three rows are provided as an example
 // Add more animals or change up the style as you desire
@@ -14,17 +15,34 @@ interface AnimalDatum  {
   diet: "herbivore" | "omnivore" | "carnivore";
 };
 
-const animalData: AnimalDatum[] = [
-  { name: "Cheetah", speed: 120, diet: "carnivore" },
-  { name: "Pronghorn", speed: 98, diet: "herbivore" },
-  { name: "Brown Bear", speed: 40, diet: "omnivore" },
-  // Add more animals here!
-];
+
 
 export default function AnimalSpeedGraph() {
   // useRef creates a reference to the div where D3 will draw the chart.
   // https://react.dev/reference/react/useRef
   const graphRef = useRef<HTMLDivElement>(null);
+  const [animalData, setAnimalData] = useState<AnimalDatum[]>([]);
+
+  // Load CSV data on mount
+  useEffect(() => {
+      csv("/sample_animals.csv", (d) => ({
+        name: d.name!,
+        speed: +d.speed!,
+        diet: d.diet as AnimalDatum["diet"],
+      }))
+        .then((data) => {
+          // Filter out any invalid diet types
+          const validData = data.filter(d =>
+            d.diet === "herbivore" || d.diet === "omnivore" || d.diet === "carnivore"
+          );
+          setAnimalData(validData as AnimalDatum[]);
+        })
+        .catch((error) => {
+          console.error("Error loading CSV:", error);
+        });
+    }, []);
+
+
 
   useEffect(() => {
     // Clear any previous SVG to avoid duplicates when React hot-reloads
@@ -32,9 +50,15 @@ export default function AnimalSpeedGraph() {
       graphRef.current.innerHTML = "";
     }
 
+    if (animalData.length === 0) return;
+
     // Set up chart dimensions and margins
-    const width = 500;
-    const height = 300;
+    const containerWidth = graphRef.current?.clientWidth ?? 800;
+    const containerHeight = graphRef.current?.clientHeight ?? 500;
+
+    // Set up chart dimensions and margins
+    const width = Math.max(containerWidth, 600); // Minimum width of 600px
+    const height = Math.max(containerHeight, 400); // Minimum height of 400px
     const margin = { top: 70, right: 60, bottom: 80, left: 100 };
 
     // Create the SVG element where D3 will draw the chart
@@ -163,14 +187,14 @@ export default function AnimalSpeedGraph() {
       .attr("font-size", "14px")
       .attr("fill", "#fff")
       .text((d) => d.charAt(0).toUpperCase() + d.slice(1));
-  }, []);
+  }, [animalData]);
 
 
 
   return (
     <section
       ref={graphRef}
-      className="border rounded flex items-center justify-center"
+      className="border rounded flex items-center justify-center w-full h-96 min-h-[400px]"
     />
   );
 }

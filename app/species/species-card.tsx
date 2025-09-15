@@ -11,11 +11,24 @@ React server components don't track state between rerenders, so leaving the uniq
 can cause errors with matching props and state in child components if the list order changes.
 */
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
+import { useState } from "react";
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
 export default function SpeciesCard({ species }: { species: Species }) {
+  // Control open/closed state of the dialog
+  const [open, setOpen] = useState<boolean>(false);
+
   return (
     <div className="m-4 w-72 min-w-72 flex-none rounded border-2 p-3 shadow">
       {species.image && (
@@ -27,7 +40,59 @@ export default function SpeciesCard({ species }: { species: Species }) {
       <h4 className="text-lg font-light italic">{species.common_name}</h4>
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
       {/* Replace the button with the detailed view dialog. */}
-      <Button className="mt-3 w-full">Learn More</Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button className="mt-3 w-full">Learn More</Button>
+        </DialogTrigger>
+        <DialogContent className="max-h-screen overflow-y-auto sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Species Details</DialogTitle>
+            <DialogDescription>Detailed information about {species.scientific_name}</DialogDescription>
+          </DialogHeader>
+          <div className="grid w-full items-center gap-4">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-700">Scientific Name</h3>
+                <p className="text-xl">{species.scientific_name}</p>
+              </div>
+
+              {species.common_name && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">Common Name</h3>
+                  <p className="text-xl italic">{species.common_name}</p>
+                </div>
+              )}
+
+              {species.kingdom && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">Kingdom</h3>
+                  <p className="text-xl">{species.kingdom}</p>
+                </div>
+              )}
+
+              {species.total_population && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">Total Population</h3>
+                  <p className="text-xl">{species.total_population.toLocaleString()}</p>
+                </div>
+              )}
+
+              {species.description && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">Description</h3>
+                  <p className="text-base leading-relaxed">{species.description}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <DialogClose asChild>
+                <Button variant="secondary">Close</Button>
+              </DialogClose>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

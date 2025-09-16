@@ -23,11 +23,14 @@ import {
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
 import { useState } from "react";
+import EditSpeciesDialog from "./edit-species";
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
-export default function SpeciesCard({ species }: { species: Species }) {
+export default function SpeciesCard({ species, currentUser }: { species: Species; currentUser: string }) {
   // Control open/closed state of the dialog
   const [open, setOpen] = useState<boolean>(false);
+
+  const canEdit = !!currentUser && !!species.author && currentUser === species.author;
 
   return (
     <div className="m-4 w-72 min-w-72 flex-none rounded border-2 p-3 shadow">
@@ -93,6 +96,7 @@ export default function SpeciesCard({ species }: { species: Species }) {
           </div>
         </DialogContent>
       </Dialog>
+      {canEdit && <EditSpeciesDialog species={species} />}
     </div>
   );
 }

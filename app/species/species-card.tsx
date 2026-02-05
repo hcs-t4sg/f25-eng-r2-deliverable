@@ -27,9 +27,7 @@ export default function SpeciesCard({ species }: { species: Species }) {
       <h4 className="text-lg font-light italic">{species.common_name}</h4>
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
       {/* Replace the button with the detailed view dialog. */}
-      <Button className="mt-3 w-full" onClick={handleClickOpen}>
-        Learn More
-      </Button>
+      <Button className="mt-3 w-full">Learn More</Button>
     </div>
   );
 }
